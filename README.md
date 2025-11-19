@@ -258,6 +258,31 @@ Menampilkan daftar ruangan yang tersedia
 - Kelola ruangan dan booking
 - Approval booking
 
+## 🚀 Deploy ke Railway
+
+Aplikasi ini sudah siap untuk di-deploy ke Railway! 
+
+### Quick Start
+Lihat file `QUICKSTART_RAILWAY.md` untuk panduan cepat (5 menit).
+
+### Dokumentasi Lengkap
+Lihat file `RAILWAY_DEPLOYMENT.md` untuk panduan detail deployment ke Railway.
+
+### File Pendukung
+- ✅ `.htaccess` - Konfigurasi Apache
+- ✅ `nixpacks.toml` - Build configuration
+- ✅ `railway.json` - Railway settings
+- ✅ `.gitignore` - Ignore unnecessary files
+- ✅ `config/database.php` - Support environment variables
+- ✅ `insert_default_data.sql` - Data default untuk production
+- ✅ `test_db_connection.php` - Test database connection
+
+### Fitur Railway Ready
+- Database configuration menggunakan environment variables
+- Support MySQL Railway
+- Apache + PHP 8.2
+- Auto-scaling support
+
 ## Support
 
 Untuk pertanyaan atau masalah, silakan hubungi administrator sistem.

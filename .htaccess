@@ -1,0 +1,30 @@
+# Enable PHP
+AddType application/x-httpd-php .php
+
+# Set default index
+DirectoryIndex index.php index.html
+
+# Error handling
+php_flag display_errors Off
+php_flag log_errors On
+
+# Security
+Options -Indexes
+
+# Rewrite rules
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+</IfModule>
+
+# Protect config files
+<FilesMatch "^(database\.php|functions\.php)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# File upload limits
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300
+php_value max_input_time 300

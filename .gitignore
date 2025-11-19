@@ -1,0 +1,42 @@
+# Local config backup
+config/database.php.local
+
+# Test files (uncomment untuk production)
+# test_db_connection.php
+# test_*.php
+# debug_*.php
+
+# Uploads - keep structure but ignore user uploads
+uploads/*.jpg
+uploads/*.jpeg
+uploads/*.png
+uploads/*.gif
+uploads/*.pdf
+uploads/profile/*
+!uploads/README.txt
+!uploads/.gitkeep
+
+# Logs
+*.log
+uploads/cron_log.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.bak
+*.old
+
+# Environment files (optional)
+.env
+.env.local
