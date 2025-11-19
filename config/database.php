@@ -6,11 +6,11 @@ $isRailway = getenv('RAILWAY_ENVIRONMENT') || getenv('MYSQLHOST');
 
 // Konfigurasi database
 if ($isRailway) {
-    define('DB_HOST', getenv('MYSQLHOST'));
-    define('DB_USER', getenv('MYSQLUSER'));
-    define('DB_PASS', getenv('MYSQLPASSWORD'));
-    define('DB_NAME', getenv('MYSQLDATABASE'));
-    define('DB_PORT', getenv('MYSQLPORT'));
+    define('DB_HOST', getenv('metro.proxy.rlwy.net'));
+    define('DB_USER', getenv('root'));
+    define('DB_PASS', getenv('MClfPGdILKmmIxLDjwgZesirmxvnXqiQ'));
+    define('DB_NAME', getenv('railway'));
+    define('DB_PORT', getenv('39388'));
 } else {
     // Localhost
     define('DB_HOST', 'localhost');
