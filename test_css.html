@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CSS Booking</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body { padding: 20px; background: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <h1>Test CSS Booking Page</h1>
+    
+    <!-- Test Page Header -->
+    <div class="page-header-booking loaded">
+        <div class="header-overlay"></div>
+        <div class="container">
+            <div class="header-content-booking">
+                <div class="header-badge">
+                    <span class="badge-icon">📝</span>
+                    <span>Booking Form</span>
+                </div>
+                <h1 class="header-title-booking">Buat Booking Ruangan</h1>
+                <p class="header-subtitle">Isi form di bawah untuk membuat booking ruangan baru</p>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: -60px; position: relative; z-index: 10; max-width: 1200px; margin-left: auto; margin-right: auto;">
+        <!-- Test Alert -->
+        <div class="alert-modern alert-success-modern">
+            <div class="alert-icon">✅</div>
+            <div class="alert-content">
+                <strong>CSS Berfungsi!</strong>
+                <p>Jika Anda melihat tampilan ini dengan gradient dan styling yang bagus, berarti CSS sudah berfungsi dengan baik.</p>
+            </div>
+        </div>
+        
+        <!-- Test Progress Steps -->
+        <div class="booking-progress">
+            <div class="progress-step active" data-step="1">
+                <div class="step-circle">
+                    <span class="step-number">1</span>
+                    <span class="step-icon">🏢</span>
+                </div>
+                <div class="step-label">Pilih Ruangan</div>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="2">
+                <div class="step-circle">
+                    <span class="step-number">2</span>
+                    <span class="step-icon">📅</span>
+                </div>
+                <div class="step-label">Jadwal & Waktu</div>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step completed" data-step="3">
+                <div class="step-circle">
+                    <span class="step-number">3</span>
+                    <span class="step-icon">📝</span>
+                </div>
+                <div class="step-label">Detail Keperluan</div>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="4">
+                <div class="step-circle">
+                    <span class="step-number">4</span>
+                    <span class="step-icon">✅</span>
+                </div>
+                <div class="step-label">Konfirmasi</div>
+            </div>
+        </div>
+        
+        <!-- Test Form Card -->
+        <div class="card-booking-modern">
+            <div class="section-header-booking">
+                <span class="section-icon">🏢</span>
+                <div>
+                    <h3>Test Section Header</h3>
+                    <p>Ini adalah test untuk melihat apakah CSS styling berfungsi</p>
+                </div>
+            </div>
+            
+            <div class="form-group-booking">
+                <label class="label-modern">
+                    <span class="label-icon">📝</span>
+                    <span class="label-text">Test Input</span>
+                    <span class="label-required">*</span>
+                </label>
+                <input type="text" class="input-modern" placeholder="Ketik sesuatu...">
+                <div class="input-helper">Ini adalah helper text</div>
+            </div>
+            
+            <div class="btn-select-room-modern">
+                <div class="btn-icon">🏢</div>
+                <div class="btn-content">
+                    <span class="btn-title">Test Button</span>
+                    <span class="btn-subtitle">Hover untuk melihat efek animasi</span>
+                </div>
+                <div class="btn-arrow">→</div>
+            </div>
+        </div>
+        
+        <!-- Test Info Card -->
+        <div class="info-card-booking">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <h4>CSS Status</h4>
+                <ul>
+                    <li>Purple gradient header dengan animasi</li>
+                    <li>Progress steps dengan circle indicators</li>
+                    <li>Form card dengan rounded corners dan shadow</li>
+                    <li>Button dengan hover effects</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto add loaded class
+        setTimeout(() => {
+            document.querySelector('.page-header-booking').classList.add('loaded');
+        }, 100);
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Filter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-box {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .error {
+            color: red;
+            background: #ffe6e6;
+        }
+        .success {
+            color: green;
+            background: #e6ffe6;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test AJAX Filter</h1>
+    
+    <div class="test-box">
+        <h2>Test 1: Load Semua Ruangan</h2>
+        <button onclick="testLoadAll()">Test Load All</button>
+    </div>
+    
+    <div class="test-box">
+        <h2>Test 2: Filter by Search</h2>
+        <button onclick="testFilterSearch()">Test Search "Lab"</button>
+    </div>
+    
+    <div class="test-box">
+        <h2>Test 3: Filter by Kategori</h2>
+        <button onclick="testFilterKategori()">Test Kategori "Lab"</button>
+    </div>
+    
+    <div class="test-box">
+        <h2>Test 4: Filter by Kapasitas</h2>
+        <button onclick="testFilterKapasitas()">Test Kapasitas "30"</button>
+    </div>
+    
+    <div id="result"></div>
+    
+    <script>
+        const resultDiv = document.getElementById('result');
+        
+        function showResult(data, error = false) {
+            resultDiv.className = error ? 'error' : 'success';
+            if (typeof data === 'object') {
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } else {
+                resultDiv.textContent = data;
+            }
+        }
+        
+        async function testLoadAll() {
+            try {
+                resultDiv.textContent = '⏳ Loading...';
+                const response = await fetch('ajax_ruangan_load.php');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                showResult({
+                    status: 'SUCCESS',
+                    total_rooms: data.total,
+                    has_html: data.html ? 'Yes' : 'No',
+                    html_length: data.html ? data.html.length : 0
+                });
+            } catch (error) {
+                showResult(`ERROR: ${error.message}`, true);
+                console.error('Error:', error);
+            }
+        }
+        
+        async function testFilterSearch() {
+            try {
+                resultDiv.textContent = '⏳ Loading...';
+                const response = await fetch('ajax_ruangan_load.php?search=Lab');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                showResult({
+                    status: 'SUCCESS',
+                    search_term: 'Lab',
+                    total_rooms: data.total,
+                    has_html: data.html ? 'Yes' : 'No',
+                    html_length: data.html ? data.html.length : 0
+                });
+            } catch (error) {
+                showResult(`ERROR: ${error.message}`, true);
+                console.error('Error:', error);
+            }
+        }
+        
+        async function testFilterKategori() {
+            try {
+                resultDiv.textContent = '⏳ Loading...';
+                const response = await fetch('ajax_ruangan_load.php?kategori=Lab');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                showResult({
+                    status: 'SUCCESS',
+                    kategori: 'Lab',
+                    total_rooms: data.total,
+                    has_html: data.html ? 'Yes' : 'No',
+                    html_length: data.html ? data.html.length : 0
+                });
+            } catch (error) {
+                showResult(`ERROR: ${error.message}`, true);
+                console.error('Error:', error);
+            }
+        }
+        
+        async function testFilterKapasitas() {
+            try {
+                resultDiv.textContent = '⏳ Loading...';
+                const response = await fetch('ajax_ruangan_load.php?kapasitas=30');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                showResult({
+                    status: 'SUCCESS',
+                    kapasitas: '30',
+                    total_rooms: data.total,
+                    has_html: data.html ? 'Yes' : 'No',
+                    html_length: data.html ? data.html.length : 0
+                });
+            } catch (error) {
+                showResult(`ERROR: ${error.message}`, true);
+                console.error('Error:', error);
+            }
+        }
+        
+        // Auto-run first test
+        window.addEventListener('load', function() {
+            console.log('Test page loaded. Click buttons to test AJAX endpoints.');
+        });
+    </script>
+</body>
+</html>

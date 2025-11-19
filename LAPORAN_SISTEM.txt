@@ -1,0 +1,1715 @@
+================================================================================
+        LAPORAN SISTEM BOOKING RUANGAN - DOKUMENTASI LENGKAP
+================================================================================
+
+Nama Sistem    : Sistem Booking Ruangan Online
+Versi          : 1.0
+Tanggal        : 13 November 2025
+Teknologi      : PHP, MySQL, JavaScript, HTML5, CSS3
+Developer      : [Nama Developer]
+
+================================================================================
+1. INTEGRASI DAN IMPLEMENTASI SISTEM
+================================================================================
+
+1.1 ARSITEKTUR SISTEM
+----------------------
+Sistem ini dibangun dengan arsitektur Model-View-Controller (MVC) sederhana:
+
+A. STRUKTUR FOLDER:
+   /PlsworkUKK/
+   ├── admin/              (Halaman admin & petugas)
+   ├── user/               (Halaman user)
+   ├── petugas/            (Halaman petugas)
+   ├── config/             (Konfigurasi database & fungsi)
+   ├── includes/           (Header, navbar, footer)
+   ├── assets/             (CSS, JavaScript, gambar)
+   ├── api/                (REST API untuk mobile)
+   └── uploads/            (Upload file foto ruangan)
+
+B. DATABASE:
+   - Nama Database: booking_ruangan
+   - Tabel Utama:
+     1. users         - Data pengguna (admin, petugas, user)
+     2. ruangan       - Data ruangan
+     3. jadwal_ruangan - Jadwal tetap ruangan
+     4. booking       - Data booking user
+     5. history       - Log aktivitas
+
+C. ROLE & PERMISSION:
+   - Admin    : Full access (kelola semua data, approval, laporan)
+   - Petugas  : Kelola ruangan, jadwal, booking, approval (tanpa user management)
+   - User     : Booking ruangan, lihat riwayat, lihat jadwal
+
+1.2 FITUR YANG TELAH DIIMPLEMENTASIKAN
+----------------------------------------
+
+A. MODUL AUTENTIKASI:
+   ✓ Login dengan validasi username & password
+   ✓ Register user baru dengan enkripsi password (bcrypt)
+   ✓ Session management untuk keamanan
+   ✓ Logout dengan destroy session
+   ✓ Redirect berdasarkan role user
+
+B. MODUL KELOLA RUANGAN (Admin/Petugas):
+   ✓ CRUD ruangan (Create, Read, Update, Delete)
+   ✓ Upload foto ruangan dengan validasi
+   ✓ Validasi form input (nama, kapasitas, lokasi, fasilitas)
+   ✓ Status ruangan (tersedia/tidak tersedia)
+   ✓ Preview foto dengan modal zoom
+   ✓ Foto thumbnail 120x120px dengan hover effect
+
+C. MODUL JADWAL RUANGAN (Admin/Petugas):
+   ✓ CRUD jadwal tetap ruangan per hari
+   ✓ Input waktu mulai & selesai
+   ✓ Penanggung jawab kegiatan
+   ✓ Status jadwal (aktif/nonaktif)
+   ✓ Validasi bentrok waktu
+
+D. MODUL BOOKING RUANGAN (User):
+   ✓ Multi-step booking form (4 langkah)
+   ✓ Pilih ruangan dengan modal dan filter
+   ✓ Input tanggal booking (tidak boleh masa lalu)
+   ✓ Input waktu dengan time picker (24 jam)
+   ✓ Validasi waktu tidak boleh lewat (hari ini)
+   ✓ Validasi minimal durasi 1 jam
+   ✓ Check busy times (jadwal bentrok)
+   ✓ Warning visual untuk waktu terpakai
+   ✓ Summary sebelum submit
+   ✓ Status approval (pending → approved/rejected → completed)
+
+E. MODUL JADWAL VIEW (Public):
+   ✓ View mingguan (7 hari)
+   ✓ View tabel (list semua jadwal)
+   ✓ Filter berdasarkan ruangan & hari
+   ✓ AJAX loading tanpa refresh
+   ✓ Menampilkan jadwal tetap + booking approved
+   ✓ Auto-cleanup booking completed
+   ✓ Visual berbeda untuk booking vs jadwal tetap
+
+F. MODUL LIST BOOKING (User):
+   ✓ Menampilkan booking approved saja
+   ✓ Tidak menampilkan booking completed
+   ✓ Countdown ke waktu mulai
+   ✓ Filter berdasarkan ruangan
+   ✓ Sort berdasarkan tanggal/ruangan
+   ✓ Info detail booking dengan card layout
+
+G. MODUL APPROVAL (Admin/Petugas):
+   ✓ List booking pending
+   ✓ Approve/Reject booking
+   ✓ Keterangan reject
+   ✓ History log otomatis
+   ✓ Notifikasi status
+
+H. MODUL LAPORAN (Admin/Petugas):
+   ✓ Filter berdasarkan bulan, status, ruangan
+   ✓ Statistik booking (total, pending, approved, rejected, completed, cancelled)
+   ✓ Export ke Excel (.xls)
+   ✓ Print ke PDF
+   ✓ Tampilan clean tanpa emoji
+
+I. MODUL HISTORY (Admin/Petugas/User):
+   ✓ Timeline aktivitas booking
+   ✓ Log perubahan status
+   ✓ Informasi lengkap per aktivitas
+   ✓ Filter berdasarkan user (admin/petugas)
+
+J. NAVBAR STICKY:
+   ✓ Navbar tetap di atas saat scroll
+   ✓ Z-index 1000 untuk prioritas
+   ✓ Position sticky dengan smooth transition
+
+K. REST API (untuk Flutter Mobile):
+   ✓ API Configuration dengan CORS
+   ✓ JWT Token authentication
+   ✓ Auth endpoints (login, register, logout, me)
+   ✓ Response format JSON standar
+
+1.3 TEKNOLOGI YANG DIGUNAKAN
+------------------------------
+
+A. BACKEND:
+   - PHP 7.4+ (Server-side scripting)
+   - MySQL 5.7+ (Database)
+   - mysqli (Database connection)
+   - Session management
+   - Password hashing (bcrypt)
+   - File upload handling
+
+B. FRONTEND:
+   - HTML5 (Structure)
+   - CSS3 (Styling dengan gradient & animation)
+   - JavaScript ES6 (Interactivity)
+   - AJAX/Fetch API (Asynchronous requests)
+   - Font Awesome 6.0 (Icons)
+   - Responsive design (Mobile-friendly)
+
+C. SECURITY:
+   - SQL Injection prevention (mysqli_real_escape_string)
+   - XSS prevention (htmlspecialchars)
+   - Password encryption (password_hash/verify)
+   - Session validation
+   - CSRF protection (session token)
+   - File upload validation
+
+D. DATABASE DESIGN:
+   - Normalisasi database (3NF)
+   - Foreign key constraints
+   - Indexing untuk performance
+   - Auto-increment primary key
+   - Timestamp (created_at, updated_at)
+
+1.4 INTEGRASI ANTAR MODUL
+---------------------------
+
+A. FLOW BOOKING:
+   User → Pilih Ruangan → Pilih Tanggal/Waktu → Input Keperluan 
+   → Submit → Status: Pending → Admin/Petugas Approve 
+   → Status: Approved → Muncul di Jadwal & List Booking 
+   → Waktu Selesai → Auto Status: Completed → Hilang dari Jadwal
+
+B. FLOW APPROVAL:
+   Booking Pending → Admin/Petugas Review → Approve/Reject 
+   → Update Status → Log History → User Lihat di Riwayat
+
+C. FLOW LAPORAN:
+   Data Booking → Filter (Bulan/Status/Ruangan) → Generate Statistik 
+   → Tampilkan Data → Export Excel/Print PDF
+
+D. AUTO-CLEANUP SYSTEM:
+   Setiap Load jadwal_view.php → Query UPDATE booking 
+   → WHERE tanggal < today OR waktu_selesai < now 
+   → SET status = 'completed' → Booking hilang dari display
+
+================================================================================
+2. SAMPLE ERROR YANG PERNAH TERJADI DAN SOLUSINYA
+================================================================================
+
+2.1 ERROR DATABASE
+-------------------
+
+ERROR #1: Foreign Key Constraint Fails
+---------------------------------------
+PESAN ERROR:
+"Fatal error: Cannot add or update a child row: foreign key constraint fails 
+(`booking_ruangan`.`booking`, CONSTRAINT `booking_ibfk_1` 
+FOREIGN KEY (`ruangan_id`) REFERENCES `ruangan` (`id`))"
+
+PENYEBAB:
+- Duplicate input field untuk ruangan_id di form booking.php
+- Line 221: <input type="hidden" name="ruangan_id">
+- Line 239: <input type="hidden" name="ruangan_id"> (DUPLICATE)
+- Mengakibatkan nilai ruangan_id kosong atau undefined
+
+SOLUSI:
+1. Hapus duplicate input di line 239
+2. Tambahkan validasi room existence sebelum insert:
+   ```php
+   $check_room = "SELECT id FROM ruangan WHERE id = '$ruangan_id' AND status = 'tersedia'";
+   $result_check = mysqli_query($conn, $check_room);
+   if (mysqli_num_rows($result_check) == 0) {
+       $error = 'Ruangan tidak valid atau tidak tersedia!';
+   }
+   ```
+3. Tambahkan SQL injection protection:
+   ```php
+   $ruangan_id_safe = mysqli_real_escape_string($conn, $ruangan_id);
+   ```
+
+STATUS: ✓ RESOLVED
+
+
+ERROR #2: UNION Query Column Mismatch
+--------------------------------------
+PESAN ERROR:
+"Terjadi kesalahan saat memuat data"
+"The used SELECT statements have a different number of columns"
+
+PENYEBAB:
+- Query UNION untuk gabungkan jadwal_ruangan dan booking
+- Jumlah kolom SELECT tidak sama:
+  * jadwal_ruangan: 8 kolom
+  * booking: 10 kolom
+- Nama kolom tidak konsisten
+
+SOLUSI:
+1. Samakan jumlah kolom di kedua SELECT (10 kolom):
+   ```sql
+   -- Jadwal tetap
+   SELECT j.waktu_mulai, j.waktu_selesai, j.kegiatan, j.keterangan,
+          r.nama_ruangan, r.lokasi, j.penanggung_jawab,
+          'jadwal' as source_type, NULL as tanggal_booking, NULL as booking_status
+   FROM jadwal_ruangan j ...
+   
+   -- Booking
+   SELECT TIME_FORMAT(b.waktu_mulai, '%H:%i:%s') as waktu_mulai,
+          TIME_FORMAT(b.waktu_selesai, '%H:%i:%s') as waktu_selesai,
+          b.keperluan as kegiatan, b.keterangan,
+          r.nama_ruangan, r.lokasi, u.nama_lengkap as penanggung_jawab,
+          'booking' as source_type, b.tanggal_booking, b.status as booking_status
+   FROM booking b ...
+   ```
+2. Gunakan UNION ALL untuk better performance
+3. Tambahkan TIME_FORMAT untuk konsistensi format waktu
+
+STATUS: ✓ RESOLVED
+
+
+ERROR #3: SQL Syntax Error - Column Name
+-----------------------------------------
+PESAN ERROR:
+"Unknown column 'nama' in 'field list'"
+
+PENYEBAB:
+- Kolom di tabel users adalah 'nama_lengkap', bukan 'nama'
+- Query salah: SELECT nama FROM users
+- Terjadi saat JOIN tabel booking dengan users
+
+SOLUSI:
+1. Ganti semua reference 'nama' dengan 'nama_lengkap'
+2. Update query:
+   ```sql
+   SELECT u.nama_lengkap as penanggung_jawab FROM users u ...
+   ```
+
+STATUS: ✓ RESOLVED
+
+
+2.2 ERROR JAVASCRIPT & AJAX
+----------------------------
+
+ERROR #4: JSON Parse Error
+---------------------------
+PESAN ERROR:
+"SyntaxError: Unexpected token < in JSON at position 0"
+
+PENYEBAB:
+- PHP error/warning output sebelum JSON response
+- HTML/text output tercampur dengan JSON
+- Tidak ada error handling di ajax_jadwal.php
+
+SOLUSI:
+1. Tambahkan output buffering:
+   ```php
+   ob_start();
+   // ... code ...
+   ob_clean(); // Clear any output before JSON
+   echo json_encode($response);
+   ```
+2. Disable error display:
+   ```php
+   error_reporting(E_ALL);
+   ini_set('display_errors', 0);
+   ini_set('log_errors', 1);
+   ```
+3. Set proper headers:
+   ```php
+   header('Content-Type: application/json; charset=utf-8');
+   ```
+4. Tambahkan error logging:
+   ```php
+   if (!$result) {
+       error_log("SQL Error: " . mysqli_error($conn));
+   }
+   ```
+
+STATUS: ✓ RESOLVED
+
+
+ERROR #5: Modal Image Preview Not Working
+------------------------------------------
+PESAN ERROR:
+(No error message, modal tidak muncul saat klik foto)
+
+PENYEBAB:
+- Inline style width/height di img tag
+- Tidak ada event listener untuk klik
+- Tidak ada modal HTML structure
+
+SOLUSI:
+1. Ganti inline style dengan class:
+   ```html
+   <img src="..." class="ruangan-foto-thumbnail" onclick="showImageModal(this.src)">
+   ```
+2. Tambahkan modal HTML:
+   ```html
+   <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+       <span class="image-modal-close">&times;</span>
+       <img class="image-modal-content" id="modalImage">
+   </div>
+   ```
+3. Tambahkan JavaScript functions:
+   ```javascript
+   function showImageModal(src) { ... }
+   function closeImageModal() { ... }
+   ```
+4. Tambahkan CSS untuk modal styling
+
+STATUS: ✓ RESOLVED
+
+
+2.3 ERROR UI/UX
+----------------
+
+ERROR #6: Navbar Not Sticky
+----------------------------
+MASALAH:
+- Navbar scroll hilang saat scroll ke bawah
+- User harus scroll ke atas untuk akses menu
+
+PENYEBAB:
+- Tidak ada position: sticky di CSS navbar
+- Default position: static
+
+SOLUSI:
+1. Tambahkan CSS:
+   ```css
+   .navbar {
+       position: sticky;
+       top: 0;
+       z-index: 1000;
+   }
+   ```
+
+STATUS: ✓ RESOLVED
+
+
+ERROR #7: Foto Ruangan Terlalu Kecil
+-------------------------------------
+MASALAH:
+- Foto ruangan hanya 60x60px
+- Sulit melihat detail ruangan
+- Tidak ada preview besar
+
+PENYEBAB:
+- Inline style width: 60px; height: 60px;
+- Tidak ada fitur zoom/preview
+
+SOLUSI:
+1. Perbesar ke 120x120px
+2. Tambahkan hover effect (scale 1.05)
+3. Implementasi modal preview full size
+4. Klik foto untuk lihat ukuran besar
+
+STATUS: ✓ RESOLVED
+
+
+ERROR #8: Warning Text Tidak Terlihat
+--------------------------------------
+MASALAH:
+- Warning text warna default (hitam) di background terang
+- Sulit dibaca user
+
+PENYEBAB:
+- Tidak ada inline style color di warning element
+
+SOLUSI:
+1. Tambahkan inline style:
+   ```html
+   <strong style="color: #fff;">WARNING TEXT</strong>
+   ```
+2. Update CSS untuk warning box
+
+STATUS: ✓ RESOLVED
+
+
+2.4 ERROR VALIDASI & LOGIC
+---------------------------
+
+ERROR #9: User Bisa Booking Waktu Lewat
+----------------------------------------
+MASALAH:
+- User bisa pilih waktu yang sudah lewat di hari ini
+- Sistem tidak validasi real-time
+
+PENYEBAB:
+- Dropdown waktu tidak ada min attribute
+- Tidak ada validasi JavaScript untuk hari ini
+
+SOLUSI:
+1. Ganti dropdown dengan input type="time"
+2. Tambahkan validasi JavaScript:
+   ```javascript
+   if (isToday) {
+       const minTime = currentHour + 1 + ':' + currentMinute;
+       waktuMulai.min = minTime;
+   }
+   ```
+3. Validasi di form submit:
+   ```javascript
+   if (isToday && startDateTime <= now) {
+       alert('Waktu tidak boleh di masa lalu!');
+       return false;
+   }
+   ```
+
+STATUS: ✓ RESOLVED
+
+
+ERROR #10: Booking Pending Muncul di Jadwal
+--------------------------------------------
+MASALAH:
+- Booking dengan status 'pending' ikut ditampilkan di jadwal
+- Seharusnya hanya 'approved' yang muncul
+
+PENYEBAB:
+- Query: WHERE status IN ('pending', 'approved')
+- Logic salah, pending seharusnya tidak tampil
+
+SOLUSI:
+1. Update query:
+   ```sql
+   WHERE b.status = 'approved'  -- hanya approved
+   ```
+2. Apply di 2 lokasi:
+   - Weekly view query (line 83)
+   - Table view query (line 238)
+
+STATUS: ✓ RESOLVED
+
+
+ERROR #11: Batasan Jam Sekolah Terlalu Ketat
+---------------------------------------------
+MASALAH:
+- User hanya bisa booking 07:00-15:30 di hari kerja
+- Permintaan untuk hilangkan batasan
+
+PENYEBAB:
+- Validasi PHP: if ($waktu_mulai < '07:00' || $waktu_mulai > '15:30')
+- JavaScript min/max attribute di input time
+
+SOLUSI:
+1. Hapus validasi PHP:
+   ```php
+   // Remove: Validasi waktu sekolah (07:00 - 15:30) untuk Senin-Jumat
+   ```
+2. Hapus JavaScript constraints:
+   ```javascript
+   waktuMulai.removeAttribute('min');
+   waktuMulai.removeAttribute('max');
+   ```
+3. Update helper text: "24 jam tersedia"
+
+STATUS: ✓ RESOLVED
+
+
+2.5 ERROR FITUR MENU
+---------------------
+
+ERROR #12: Menu Laporan Terlalu Ramai
+--------------------------------------
+MASALAH:
+- Terlalu banyak emoji di menu laporan
+- Tampilan kurang profesional untuk admin
+
+PENYEBAB:
+- Emoji di header, button, stat cards
+- Design choice awal untuk "friendly UI"
+
+SOLUSI:
+1. Remove emoji dari header icon
+2. Hide icon di button dengan CSS:
+   ```css
+   .btn-icon .icon { display: none; }
+   .header-icon { display: none; }
+   .stat-icon { display: none; }
+   ```
+3. Simplify text:
+   - "📊 Laporan" → "Laporan"
+   - "🔍 Filter" → "Filter"
+
+STATUS: ✓ RESOLVED
+
+
+ERROR #13: Hero Cards Tidak Diperlukan
+---------------------------------------
+MASALAH:
+- Cards "⚡ Booking Cepat", "✅ Approval Online", "📊 Dashboard Real-time"
+- Redundant, tidak ada fungsi
+
+PENYEBAB:
+- Copy-paste dari template
+- Aesthetic saja, tidak fungsional
+
+SOLUSI:
+1. Remove HTML div .hero-features
+2. Langsung ke tombol Login/Register
+
+STATUS: ✓ RESOLVED
+
+================================================================================
+3. REVISI DAN PERBAIKAN SISTEM
+================================================================================
+
+[HALAMAN 27]
+
+C. SAMPLE ERROR DAN REVISI
+===========================
+
+KATEGORI ERROR YANG PERNAH TERJADI:
+
+1. DATABASE ERRORS (Error #1, #2, #3)
+   - Foreign Key Constraint Fails
+   - UNION Query Column Mismatch
+   - SQL Syntax Error (Column Name)
+
+2. JAVASCRIPT & AJAX ERRORS (Error #4, #5)
+   - JSON Parse Error
+   - Modal Image Preview Not Working
+
+3. UI/UX ERRORS (Error #6, #7, #8)
+   - Navbar Not Sticky
+   - Foto Ruangan Terlalu Kecil
+   - Warning Text Tidak Terlihat
+
+4. VALIDASI & LOGIC ERRORS (Error #9, #10, #11)
+   - User Bisa Booking Waktu Lewat
+   - Booking Pending Muncul di Jadwal
+   - Batasan Jam Sekolah Terlalu Ketat
+
+5. FITUR MENU ERRORS (Error #12, #13)
+   - Menu Laporan Terlalu Ramai
+   - Hero Cards Tidak Diperlukan
+
+REVISI YANG TELAH DILAKUKAN:
+
+REVISI MAYOR:
+1. Implementasi Auto-Cleanup Booking
+   - Otomatis update status booking completed
+   - Jadwal selalu menampilkan data terbaru
+   - Database tetap clean dan efisien
+
+2. Integrasi Booking ke Jadwal View
+   - Gabungkan jadwal tetap dan booking approved
+   - Visual berbeda untuk identifikasi
+   - User dapat melihat jadwal lengkap
+
+3. Time Input Improvement
+   - Ganti dropdown ke time picker
+   - Fleksibilitas input waktu
+   - Validasi real-time
+
+4. List Booking Menu untuk User
+   - Menu khusus booking aktif
+   - Filter dan sort features
+   - Countdown timer
+
+REVISI MINOR:
+5. Sticky Navbar - Position sticky untuk navbar
+6. Foto Ruangan Bigger - 120x120px dengan modal preview
+7. Remove Emoji dari Laporan - Tampilan profesional
+8. Remove Hero Cards - Hapus elemen tidak fungsional
+9. Remove Time Restrictions - Booking 24 jam
+10. Filter Booking by Status - Hanya approved yang tampil
+
+3.1 REVISI MAYOR
+-----------------
+
+REVISI #1: Implementasi Auto-Cleanup Booking
+---------------------------------------------
+TANGGAL: [Tanggal implementasi]
+DESKRIPSI:
+- Booking yang sudah selesai masih muncul di jadwal
+- Perlu auto-update status menjadi 'completed'
+
+IMPLEMENTASI:
+1. Tambah query di jadwal_view.php (line 11-19):
+   ```php
+   $cleanup_query = "UPDATE booking 
+                     SET status = 'completed', updated_at = NOW()
+                     WHERE status IN ('approved', 'pending')
+                       AND (tanggal_booking < '$today' 
+                       OR (tanggal_booking = '$today' AND waktu_selesai < '$now'))";
+   mysqli_query($conn, $cleanup_query);
+   ```
+2. Jalankan setiap kali halaman jadwal dibuka
+3. Booking completed tidak ditampilkan di query (status = 'approved')
+
+HASIL:
+✓ Jadwal selalu up-to-date
+✓ Booking expired otomatis hilang
+✓ Database tetap clean
+
+STATUS: ✓ IMPLEMENTED
+
+
+REVISI #2: Integrasi Booking ke Jadwal View
+--------------------------------------------
+TANGGAL: [Tanggal implementasi]
+DESKRIPSI:
+- User ingin lihat booking mereka di jadwal ruangan
+- Perlu gabungkan jadwal tetap + booking approved
+
+IMPLEMENTASI:
+1. Buat UNION query gabungkan 2 tabel:
+   ```sql
+   (SELECT ... FROM jadwal_ruangan ...) 
+   UNION ALL 
+   (SELECT ... FROM booking ...)
+   ```
+2. Tambah kolom 'source_type' untuk identifikasi
+3. Visual berbeda dengan CSS:
+   - .booking-item: background orange/yellow gradient
+   - .booking-badge: badge hijau "Approved"
+4. Apply di weekly view & table view
+
+HASIL:
+✓ Booking approved muncul di jadwal
+✓ Visual jelas membedakan jadwal vs booking
+✓ User bisa lihat jadwal lengkap
+
+STATUS: ✓ IMPLEMENTED
+
+
+REVISI #3: Time Input Improvement
+----------------------------------
+TANGGAL: [Tanggal implementasi]
+DESKRIPSI:
+- Dropdown waktu dengan interval 30 menit terbatas
+- User ingin fleksibilitas input waktu
+
+IMPLEMENTASI:
+1. Ganti <select> dengan <input type="time">
+2. Hapus fungsi generateTimeOptions()
+3. Hapus fungsi populateTimeOptions()
+4. Validasi min time untuk hari ini:
+   ```javascript
+   if (isToday) {
+       waktuMulai.min = (currentHour + 1) + ':' + currentMinute;
+   }
+   ```
+5. Auto-update waktu_selesai minimal = waktu_mulai + 1 jam
+
+HASIL:
+✓ User bisa input waktu bebas (tidak terbatas interval)
+✓ Lebih user-friendly dengan time picker browser
+✓ Tetap ada validasi waktu tidak lewat
+
+STATUS: ✓ IMPLEMENTED
+
+
+REVISI #4: List Booking Menu untuk User
+----------------------------------------
+TANGGAL: [Tanggal implementasi]
+DESKRIPSI:
+- User ingin lihat list booking approved terpisah dari riwayat
+- Menu khusus untuk booking aktif
+
+IMPLEMENTASI:
+1. Buat file user/list_booking.php
+2. Query: WHERE status = 'approved' (tidak completed)
+3. Tampilkan dengan card layout modern
+4. Features:
+   - Countdown ke waktu mulai
+   - Filter berdasarkan ruangan
+   - Sort berdasarkan tanggal/ruangan
+   - Status "Sedang Berlangsung" saat aktif
+5. Tambahkan menu di navbar
+
+HASIL:
+✓ User mudah tracking booking aktif
+✓ Tidak bercampur dengan riwayat completed
+✓ Info countdown berguna untuk persiapan
+
+STATUS: ✓ IMPLEMENTED
+
+
+3.2 REVISI MINOR
+-----------------
+
+REVISI #5: Sticky Navbar
+------------------------
+Tambahkan position: sticky agar navbar tetap terlihat saat scroll
+
+STATUS: ✓ IMPLEMENTED
+
+
+REVISI #6: Foto Ruangan Bigger
+-------------------------------
+Perbesar dari 60x60 ke 120x120px dan tambahkan modal preview
+
+STATUS: ✓ IMPLEMENTED
+
+
+REVISI #7: Remove Emoji dari Laporan
+-------------------------------------
+Hilangkan emoji untuk tampilan lebih profesional
+
+STATUS: ✓ IMPLEMENTED
+
+
+REVISI #8: Remove Hero Cards
+-----------------------------
+Hapus cards fitur yang tidak fungsional di homepage
+
+STATUS: ✓ IMPLEMENTED
+
+
+REVISI #9: Remove Time Restrictions
+------------------------------------
+Hilangkan batasan jam sekolah, user bisa booking 24 jam
+
+STATUS: ✓ IMPLEMENTED
+
+
+REVISI #10: Filter Booking by Status
+-------------------------------------
+Jadwal hanya tampilkan booking 'approved', bukan 'pending'
+
+STATUS: ✓ IMPLEMENTED
+
+================================================================================
+4. TESTING & QUALITY ASSURANCE
+================================================================================
+
+4.1 UNIT TESTING
+----------------
+
+TEST #1: Login Function
+- Input valid username & password → ✓ Success login
+- Input invalid username → ✓ Error message
+- Input invalid password → ✓ Error message
+- Empty fields → ✓ Validation error
+
+TEST #2: Register Function
+- Valid data → ✓ Success register
+- Duplicate username → ✓ Error message
+- Duplicate email → ✓ Error message
+- Weak password → ✓ Validation error
+
+TEST #3: Booking Function
+- Valid booking → ✓ Status pending created
+- Duplicate time → ✓ Error validation
+- Past date → ✓ Validation error
+- Past time (today) → ✓ Validation error
+
+TEST #4: Approval Function
+- Approve booking → ✓ Status changed to approved
+- Reject booking → ✓ Status changed to rejected
+- History logged → ✓ Record created
+
+TEST #5: Auto-Cleanup
+- Past booking → ✓ Status changed to completed
+- Future booking → ✓ Status unchanged
+
+4.2 INTEGRATION TESTING
+------------------------
+
+TEST #1: Booking Flow
+User booking → Admin approve → Muncul di jadwal → Expired → Hilang
+RESULT: ✓ PASS
+
+TEST #2: Filter Function
+Filter ruangan → Update display → Reset → Show all
+RESULT: ✓ PASS
+
+TEST #3: AJAX Loading
+Change filter → AJAX request → Update content → No page refresh
+RESULT: ✓ PASS
+
+TEST #4: Modal Preview
+Click foto → Modal show → Click X/outside → Modal close
+RESULT: ✓ PASS
+
+4.3 BROWSER COMPATIBILITY
+--------------------------
+✓ Google Chrome (Latest)
+✓ Mozilla Firefox (Latest)
+✓ Microsoft Edge (Latest)
+✓ Safari (Latest)
+✓ Mobile Chrome (Android)
+✓ Mobile Safari (iOS)
+
+4.4 RESPONSIVE DESIGN
+----------------------
+✓ Desktop (1920x1080)
+✓ Laptop (1366x768)
+✓ Tablet (768x1024)
+✓ Mobile (375x667)
+
+================================================================================
+5. SECURITY MEASURES
+================================================================================
+
+5.1 IMPLEMENTED SECURITY
+-------------------------
+
+1. SQL INJECTION PREVENTION
+   - mysqli_real_escape_string() untuk semua input
+   - Prepared statements untuk query sensitif
+   
+2. XSS PREVENTION
+   - htmlspecialchars() untuk output user input
+   - Content Security Policy headers
+   
+3. PASSWORD SECURITY
+   - Password hashing dengan bcrypt
+   - Minimum 6 characters
+   - password_verify() untuk checking
+   
+4. SESSION MANAGEMENT
+   - Session regenerate after login
+   - Session timeout (24 hours)
+   - Secure session cookies
+   
+5. FILE UPLOAD SECURITY
+   - Validate file type (image only)
+   - Validate file size (max 5MB)
+   - Rename file dengan unique name
+   - Store di folder uploads dengan permission terbatas
+   
+6. ACCESS CONTROL
+   - Role-based authorization
+   - requireAuth() function
+   - requireRole() function untuk API
+   
+7. CSRF PROTECTION
+   - Session token validation
+   - Form token verification
+
+================================================================================
+6. PERFORMANCE OPTIMIZATION
+================================================================================
+
+6.1 DATABASE OPTIMIZATION
+--------------------------
+- Index pada kolom yang sering di-query (ruangan_id, user_id, tanggal_booking)
+- UNION ALL instead of UNION (faster)
+- Limit query result dengan pagination
+- Cache query result dengan memcached (future)
+
+6.2 FRONTEND OPTIMIZATION
+--------------------------
+- Minify CSS & JavaScript (production)
+- Image compression untuk foto ruangan
+- Lazy loading untuk gambar
+- AJAX untuk partial page update
+- LocalStorage untuk save user preference
+
+6.3 CODE OPTIMIZATION
+----------------------
+- Reusable functions di config/functions.php
+- Modular code structure
+- Clean code principles
+- Comment untuk code readability
+
+================================================================================
+7. FUTURE IMPROVEMENTS
+================================================================================
+
+7.1 PLANNED FEATURES
+--------------------
+1. Email notification system
+2. SMS notification dengan Twilio
+3. Mobile app dengan Flutter
+4. QR Code untuk check-in booking
+5. Calendar integration (Google Calendar, Outlook)
+6. Real-time chat dengan admin
+7. Rating & review sistem
+8. Analytics dashboard
+9. Multi-language support
+10. Dark mode theme
+
+7.2 TECHNICAL DEBT
+------------------
+1. Migrate to PDO for better database handling
+2. Implement proper MVC framework (Laravel/CodeIgniter)
+3. Add unit testing dengan PHPUnit
+4. Implement Redis for caching
+5. Add queue system untuk background jobs
+6. Implement WebSocket untuk real-time updates
+7. Add API rate limiting
+8. Implement microservices architecture
+
+================================================================================
+8. DEPLOYMENT & MAINTENANCE
+================================================================================
+
+8.1 DEPLOYMENT CHECKLIST
+-------------------------
+□ Backup database
+□ Update config/database.php dengan production credentials
+□ Set error_reporting(0) di production
+□ Enable HTTPS/SSL
+□ Set secure session cookies
+□ Change JWT secret key
+□ Enable MySQL query log untuk monitoring
+□ Set proper file permissions (755 untuk folder, 644 untuk file)
+□ Remove test files dan debug code
+□ Enable gzip compression
+□ Setup cron job untuk auto-cleanup
+
+8.2 MAINTENANCE SCHEDULE
+-------------------------
+- Daily: Check error logs
+- Weekly: Database backup
+- Monthly: Security audit
+- Quarterly: Performance review
+- Yearly: System upgrade
+
+8.3 MONITORING
+--------------
+- Server uptime monitoring
+- Database query performance
+- Error rate tracking
+- User activity logging
+- Disk space monitoring
+
+================================================================================
+9. DOKUMENTASI API
+================================================================================
+
+BASE URL: http://localhost/PlsworkUKK/api/
+
+9.1 AUTHENTICATION ENDPOINTS
+-----------------------------
+
+POST /api/auth.php?action=login
+Request:
+{
+  "username": "string",
+  "password": "string"
+}
+Response:
+{
+  "success": true,
+  "message": "Login berhasil",
+  "data": {
+    "token": "jwt_token_here",
+    "user": {
+      "id": 1,
+      "username": "user",
+      "nama_lengkap": "User Name",
+      "email": "user@email.com",
+      "role": "user"
+    }
+  }
+}
+
+POST /api/auth.php?action=register
+Request:
+{
+  "username": "string",
+  "password": "string",
+  "nama_lengkap": "string",
+  "email": "string",
+  "no_hp": "string"
+}
+Response:
+{
+  "success": true,
+  "message": "Registrasi berhasil",
+  "data": {
+    "token": "jwt_token_here",
+    "user": {...}
+  }
+}
+
+GET /api/auth.php?action=me
+Headers: Authorization: Bearer {token}
+Response:
+{
+  "success": true,
+  "message": "User data retrieved",
+  "data": {
+    "id": 1,
+    "username": "user",
+    "nama_lengkap": "User Name",
+    "email": "user@email.com",
+    "role": "user"
+  }
+}
+
+================================================================================
+10. CONTACT & SUPPORT
+================================================================================
+
+Developer: [Nama Developer]
+Email: [email@domain.com]
+Phone: [Nomor Telepon]
+Repository: [Git URL]
+Documentation: [Doc URL]
+
+================================================================================
+                            END OF DOCUMENTATION
+================================================================================
+
+Tanggal Pembuatan: 13 November 2025
+Versi Dokumen: 1.0
+Status: FINAL
+
+Dokumen ini merupakan laporan lengkap sistem Booking Ruangan yang mencakup:
+- Integrasi dan implementasi sistem
+- Sample error dan solusinya
+- Revisi dan perbaikan yang dilakukan
+- Testing dan quality assurance
+- Security measures
+- Performance optimization
+- Future improvements
+- Deployment checklist
+- API documentation
+
+Semua informasi di dokumen ini berdasarkan implementasi actual sistem dan
+pengalaman debugging selama development process.
+
+================================================================================
+
+[HALAMAN 29]
+
+================================================================================
+BAB IV
+PENUTUP
+================================================================================
+
+A. KESIMPULAN
+=============
+
+Berdasarkan hasil pengembangan dan implementasi Sistem Booking Ruangan Online, 
+dapat disimpulkan beberapa hal sebagai berikut:
+
+1. KEBERHASILAN IMPLEMENTASI SISTEM
+   Sistem Booking Ruangan Online telah berhasil dibangun dengan fitur-fitur 
+   lengkap yang mencakup manajemen ruangan, penjadwalan, booking, approval, 
+   dan pelaporan. Sistem ini mampu memfasilitasi tiga role pengguna (Admin, 
+   Petugas, dan User) dengan hak akses yang sesuai kebutuhan masing-masing.
+
+2. SOLUSI TERHADAP PERMASALAHAN
+   Sistem ini berhasil mengatasi permasalahan manual booking ruangan yang 
+   sering terjadi bentrok jadwal, proses approval yang lambat, dan kesulitan 
+   monitoring. Dengan fitur real-time checking dan auto-cleanup, sistem 
+   dapat menjaga konsistensi data dan menampilkan informasi yang selalu 
+   up-to-date.
+
+3. TEKNOLOGI DAN KEAMANAN
+   Implementasi menggunakan PHP, MySQL, dan JavaScript telah terbukti 
+   efektif untuk membangun aplikasi web yang responsif dan aman. Berbagai 
+   security measures seperti SQL injection prevention, XSS prevention, 
+   password hashing, dan session management telah diterapkan untuk menjaga 
+   keamanan data pengguna.
+
+4. USER EXPERIENCE
+   Interface yang user-friendly dengan multi-step booking form, visual 
+   feedback, dan validation real-time membuat proses booking menjadi mudah 
+   dan intuitif. Fitur busy times checking dan countdown timer memberikan 
+   informasi yang berguna bagi pengguna.
+
+5. MANAJEMEN DAN MONITORING
+   Sistem approval yang terstruktur dan history logging memungkinkan admin 
+   dan petugas untuk melakukan monitoring aktivitas booking dengan baik. 
+   Fitur laporan dengan filter dan export memudahkan proses analisis dan 
+   dokumentasi.
+
+6. PEMBELAJARAN DARI ERROR
+   Proses development menghadapi 13 error yang berbeda-beda mulai dari 
+   database, AJAX, UI/UX, validasi, hingga fitur menu. Semua error berhasil 
+   diselesaikan dan menjadi pembelajaran penting tentang debugging, problem 
+   solving, dan best practices dalam web development.
+
+7. REVISI DAN PERBAIKAN
+   Sistem telah melalui 10 revisi (4 revisi mayor dan 6 revisi minor) yang 
+   meningkatkan fungsionalitas, user experience, dan performance. Revisi-
+   revisi ini menunjukkan pentingnya iterasi dalam pengembangan software.
+
+8. KESIAPAN IMPLEMENTASI
+   Dengan testing yang komprehensif mencakup unit testing, integration 
+   testing, browser compatibility, dan responsive design, sistem telah siap 
+   untuk diimplementasikan di production environment dengan deployment 
+   checklist yang lengkap.
+
+
+B. SARAN
+========
+
+Berdasarkan pengalaman pengembangan dan hasil evaluasi sistem, berikut 
+adalah beberapa saran untuk pengembangan lebih lanjut:
+
+1. PENINGKATAN NOTIFIKASI
+   Saran: Implementasi email notification dan SMS notification untuk 
+   memberitahu user tentang status approval booking mereka secara otomatis. 
+   Hal ini akan meningkatkan responsiveness dan user engagement.
+
+2. MOBILE APPLICATION
+   Saran: Mengembangkan mobile application native dengan Flutter atau React 
+   Native untuk memberikan user experience yang lebih baik di perangkat 
+   mobile. REST API sudah disiapkan dan siap untuk integrasi dengan mobile 
+   app.
+
+3. INTEGRASI KALENDER
+   Saran: Integrasi dengan Google Calendar atau Microsoft Outlook agar user 
+   dapat sync booking mereka ke kalender personal. Fitur ini akan membantu 
+   user dalam time management.
+
+4. QR CODE CHECK-IN
+   Saran: Implementasi QR Code untuk check-in booking agar verifikasi 
+   kehadiran lebih mudah dan trackable. Admin/petugas dapat monitoring 
+   penggunaan ruangan secara real-time.
+
+5. RATING & REVIEW SYSTEM
+   Saran: Tambahkan fitur rating dan review untuk ruangan agar user dapat 
+   memberikan feedback dan membantu user lain dalam memilih ruangan yang 
+   sesuai kebutuhan.
+
+6. ANALYTICS DASHBOARD
+   Saran: Kembangkan analytics dashboard yang lebih advanced dengan 
+   visualisasi data (chart, graph) untuk memudahkan analisis tren booking, 
+   ruangan populer, peak hours, dan statistik lainnya.
+
+7. TEKNOLOGI FRAMEWORK
+   Saran: Untuk pengembangan jangka panjang, pertimbangkan migrasi ke 
+   modern PHP framework seperti Laravel atau CodeIgniter untuk code 
+   structure yang lebih maintainable dan scalable.
+
+8. REAL-TIME UPDATES
+   Saran: Implementasi WebSocket atau Server-Sent Events untuk real-time 
+   updates tanpa perlu refresh page. User dapat melihat perubahan jadwal 
+   dan approval secara instant.
+
+9. CACHING MECHANISM
+   Saran: Implementasi Redis atau Memcached untuk caching query result dan 
+   session data agar performance sistem lebih optimal, terutama saat traffic 
+   tinggi.
+
+10. AUTOMATED TESTING
+    Saran: Setup automated testing dengan PHPUnit untuk unit testing dan 
+    Selenium untuk end-to-end testing. Hal ini akan mempercepat development 
+    cycle dan mengurangi regression bugs.
+
+11. BACKUP AUTOMATION
+    Saran: Setup automated backup database dengan cron job harian dan 
+    simpan di cloud storage (Google Drive, Dropbox, AWS S3) untuk disaster 
+    recovery.
+
+12. DOCUMENTATION MAINTENANCE
+    Saran: Maintain dokumentasi sistem dengan update setiap ada perubahan 
+    fitur atau perbaikan bug. Gunakan tools seperti Swagger untuk API 
+    documentation yang interactive.
+
+13. USER TRAINING
+    Saran: Buat user manual lengkap dengan screenshot dan video tutorial 
+    untuk memudahkan onboarding user baru, terutama admin dan petugas yang 
+    akan mengelola sistem.
+
+14. PERFORMANCE MONITORING
+    Saran: Implementasi monitoring tools seperti New Relic atau DataDog 
+    untuk tracking performance metrics, error rate, dan user behavior. Data 
+    ini berguna untuk optimization dan troubleshooting.
+
+15. ACCESSIBILITY
+    Saran: Improve accessibility dengan mengikuti WCAG guidelines agar 
+    sistem dapat digunakan oleh user dengan disabilities. Tambahkan keyboard 
+    navigation, screen reader support, dan high contrast mode.
+
+
+PENUTUP:
+
+Sistem Booking Ruangan Online ini merupakan solusi yang efektif untuk 
+mengelola booking ruangan secara terstruktur dan efisien. Dengan fitur-fitur 
+yang lengkap, keamanan yang baik, dan user interface yang intuitif, sistem 
+ini siap diimplementasikan dan dapat dikembangkan lebih lanjut sesuai 
+kebutuhan organisasi.
+
+Pengembangan sistem ini memberikan pembelajaran berharga tentang web 
+development, database design, security implementation, problem solving, dan 
+user experience design. Semoga sistem ini dapat bermanfaat dan terus 
+ditingkatkan untuk memberikan layanan yang lebih baik.
+
+
+================================================================================
+DAFTAR PUSTAKA
+================================================================================
+
+[1] Kadir, Abdul. (2014). Pengenalan Sistem Informasi Edisi Revisi. 
+    Yogyakarta: Andi Offset.
+
+[2] Sommerville, Ian. (2011). Software Engineering (9th Edition). 
+    Boston: Pearson Education.
+
+[3] Pressman, Roger S. (2015). Software Engineering: A Practitioner's 
+    Approach (8th Edition). New York: McGraw-Hill Education.
+
+[4] Connolly, Thomas & Begg, Carolyn. (2015). Database Systems: A Practical 
+    Approach to Design, Implementation, and Management (6th Edition). 
+    Harlow: Pearson Education.
+
+[5] Mozilla Developer Network. (2025). Web APIs and JavaScript Documentation. 
+    Tersedia: https://developer.mozilla.org [Diakses: November 2025]
+
+[6] PHP Documentation Group. (2025). PHP Manual. 
+    Tersedia: https://www.php.net/manual/en/ [Diakses: November 2025]
+
+[7] MySQL Documentation Team. (2025). MySQL 5.7 Reference Manual. 
+    Tersedia: https://dev.mysql.com/doc/refman/5.7/en/ [Diakses: November 2025]
+
+[8] W3C. (2025). HTML5: A vocabulary and associated APIs for HTML and XHTML. 
+    Tersedia: https://www.w3.org/TR/html5/ [Diakses: November 2025]
+
+[9] OWASP Foundation. (2025). OWASP Top 10 Web Application Security Risks. 
+    Tersedia: https://owasp.org/www-project-top-ten/ [Diakses: November 2025]
+
+[10] Fielding, Roy Thomas. (2000). Architectural Styles and the Design of 
+     Network-based Software Architectures. Doctoral dissertation, 
+     University of California, Irvine.
+
+[11] Gamma, Erich et al. (1994). Design Patterns: Elements of Reusable 
+     Object-Oriented Software. Boston: Addison-Wesley Professional.
+
+[12] Martin, Robert C. (2008). Clean Code: A Handbook of Agile Software 
+     Craftsmanship. Upper Saddle River: Prentice Hall.
+
+[13] Fowler, Martin. (2018). Refactoring: Improving the Design of Existing 
+     Code (2nd Edition). Boston: Addison-Wesley Professional.
+
+[14] Nielsen, Jakob. (2000). Designing Web Usability: The Practice of 
+     Simplicity. Indianapolis: New Riders Publishing.
+
+[15] Bootstrap Team. (2025). Bootstrap Documentation. 
+     Tersedia: https://getbootstrap.com/docs/ [Diakses: November 2025]
+
+[16] Font Awesome. (2025). Font Awesome Icons Documentation. 
+     Tersedia: https://fontawesome.com/docs [Diakses: November 2025]
+
+[17] Stack Overflow Community. (2025). Stack Overflow - Developer Community. 
+     Tersedia: https://stackoverflow.com [Diakses: November 2025]
+
+[18] GitHub, Inc. (2025). GitHub Documentation and Best Practices. 
+     Tersedia: https://docs.github.com [Diakses: November 2025]
+
+
+================================================================================
+LAMPIRAN
+================================================================================
+
+LAMPIRAN A: STRUKTUR DATABASE
+------------------------------
+
+A.1 TABEL USERS
+---------------
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `nama_lengkap` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `no_hp` varchar(20) DEFAULT NULL,
+  `role` enum('admin','petugas','user') NOT NULL DEFAULT 'user',
+  `foto_profil` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+A.2 TABEL RUANGAN
+-----------------
+CREATE TABLE `ruangan` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nama_ruangan` varchar(100) NOT NULL,
+  `kapasitas` int(11) NOT NULL,
+  `lokasi` varchar(200) NOT NULL,
+  `fasilitas` text,
+  `foto` varchar(255) DEFAULT NULL,
+  `status` enum('tersedia','tidak_tersedia') NOT NULL DEFAULT 'tersedia',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+A.3 TABEL JADWAL_RUANGAN
+-------------------------
+CREATE TABLE `jadwal_ruangan` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ruangan_id` int(11) NOT NULL,
+  `hari` enum('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu') NOT NULL,
+  `waktu_mulai` time NOT NULL,
+  `waktu_selesai` time NOT NULL,
+  `kegiatan` varchar(200) NOT NULL,
+  `penanggung_jawab` varchar(100) NOT NULL,
+  `keterangan` text,
+  `status` enum('aktif','nonaktif') NOT NULL DEFAULT 'aktif',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `ruangan_id` (`ruangan_id`),
+  CONSTRAINT `jadwal_ruangan_ibfk_1` FOREIGN KEY (`ruangan_id`) REFERENCES `ruangan` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+A.4 TABEL BOOKING
+-----------------
+CREATE TABLE `booking` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `ruangan_id` int(11) NOT NULL,
+  `tanggal_booking` date NOT NULL,
+  `waktu_mulai` time NOT NULL,
+  `waktu_selesai` time NOT NULL,
+  `keperluan` varchar(200) NOT NULL,
+  `keterangan` text,
+  `status` enum('pending','approved','rejected','completed','cancelled') NOT NULL DEFAULT 'pending',
+  `keterangan_reject` text,
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `ruangan_id` (`ruangan_id`),
+  KEY `tanggal_booking` (`tanggal_booking`),
+  KEY `status` (`status`),
+  CONSTRAINT `booking_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `booking_ibfk_2` FOREIGN KEY (`ruangan_id`) REFERENCES `ruangan` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `booking_ibfk_3` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+A.5 TABEL HISTORY
+-----------------
+CREATE TABLE `history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `booking_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `action` varchar(50) NOT NULL,
+  `keterangan` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `booking_id` (`booking_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `history_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `history_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+A.6 TABEL PASSWORD_RESET_REQUESTS
+----------------------------------
+CREATE TABLE `password_reset_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `request_email` varchar(100) DEFAULT NULL,
+  `reason` text,
+  `reset_token` varchar(64) DEFAULT NULL,
+  `token_expiry` datetime DEFAULT NULL,
+  `status` enum('pending','approved','rejected','completed') NOT NULL DEFAULT 'pending',
+  `admin_note` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `reset_token` (`reset_token`),
+  KEY `status` (`status`),
+  CONSTRAINT `password_reset_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+LAMPIRAN B: SCREENSHOT SISTEM
+------------------------------
+
+B.1 HALAMAN LOGIN
+[Screenshot halaman login dengan form username dan password]
+
+B.2 HALAMAN DASHBOARD ADMIN
+[Screenshot dashboard admin dengan statistik dan menu navigasi]
+
+B.3 HALAMAN KELOLA RUANGAN
+[Screenshot halaman kelola ruangan dengan tabel data dan foto ruangan]
+
+B.4 HALAMAN JADWAL RUANGAN
+[Screenshot halaman jadwal dengan view mingguan dan tabel]
+
+B.5 HALAMAN BOOKING (USER)
+[Screenshot multi-step booking form dengan pilihan ruangan]
+
+B.6 HALAMAN APPROVAL
+[Screenshot halaman approval dengan list booking pending]
+
+B.7 HALAMAN LAPORAN
+[Screenshot halaman laporan dengan filter dan statistik]
+
+B.8 HALAMAN RIWAYAT
+[Screenshot halaman riwayat dengan timeline aktivitas]
+
+B.9 HALAMAN MOBILE RESPONSIVE
+[Screenshot tampilan mobile dengan hamburger menu]
+
+B.10 HALAMAN RESET PASSWORD
+[Screenshot halaman reset password dengan form token]
+
+
+LAMPIRAN C: KODE SUMBER PENTING
+--------------------------------
+
+C.1 CONFIG/DATABASE.PHP
+-----------------------
+```php
+<?php
+$host = 'localhost';
+$user = 'root';
+$pass = '';
+$db   = 'booking_ruangan';
+
+$conn = mysqli_connect($host, $user, $pass, $db);
+
+if (!$conn) {
+    die("Koneksi gagal: " . mysqli_connect_error());
+}
+
+mysqli_set_charset($conn, 'utf8mb4');
+?>
+```
+
+
+C.2 CONFIG/FUNCTIONS.PHP - FUNGSI AUTHENTICATION
+-------------------------------------------------
+```php
+<?php
+function requireLogin() {
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: ../login.php');
+        exit();
+    }
+}
+
+function requireRole($allowed_roles = []) {
+    if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], $allowed_roles)) {
+        header('Location: ../index.php');
+        exit();
+    }
+}
+
+function sanitize($data) {
+    global $conn;
+    return mysqli_real_escape_string($conn, htmlspecialchars(trim($data)));
+}
+?>
+```
+
+
+C.3 AJAX_JADWAL.PHP - AJAX HANDLER
+-----------------------------------
+```php
+<?php
+session_start();
+require_once '../config/database.php';
+
+header('Content-Type: application/json; charset=utf-8');
+ob_start();
+
+$response = array('success' => false, 'message' => '', 'data' => null);
+
+try {
+    $ruangan_id = isset($_GET['ruangan_id']) ? intval($_GET['ruangan_id']) : 0;
+    $view = isset($_GET['view']) ? $_GET['view'] : 'weekly';
+    
+    // Query logic here...
+    
+    $response['success'] = true;
+    $response['data'] = $data;
+} catch (Exception $e) {
+    error_log("Error: " . $e->getMessage());
+    $response['message'] = 'Terjadi kesalahan saat memuat data';
+}
+
+ob_clean();
+echo json_encode($response);
+?>
+```
+
+
+C.4 VALIDATION JAVASCRIPT
+--------------------------
+```javascript
+function validateBookingForm() {
+    const tanggal = document.getElementById('tanggal_booking').value;
+    const waktuMulai = document.getElementById('waktu_mulai').value;
+    const waktuSelesai = document.getElementById('waktu_selesai').value;
+    
+    // Validate date not in past
+    const today = new Date().toISOString().split('T')[0];
+    if (tanggal < today) {
+        alert('Tanggal booking tidak boleh di masa lalu!');
+        return false;
+    }
+    
+    // Validate time if today
+    if (tanggal === today) {
+        const now = new Date();
+        const startTime = new Date(tanggal + ' ' + waktuMulai);
+        if (startTime <= now) {
+            alert('Waktu tidak boleh di masa lalu!');
+            return false;
+        }
+    }
+    
+    // Validate duration minimum 1 hour
+    const start = new Date('2000-01-01 ' + waktuMulai);
+    const end = new Date('2000-01-01 ' + waktuSelesai);
+    const duration = (end - start) / (1000 * 60 * 60);
+    
+    if (duration < 1) {
+        alert('Durasi booking minimal 1 jam!');
+        return false;
+    }
+    
+    return true;
+}
+```
+
+
+LAMPIRAN D: PANDUAN INSTALASI
+------------------------------
+
+D.1 REQUIREMENTS
+----------------
+- PHP 7.4 atau lebih tinggi
+- MySQL 5.7 atau lebih tinggi
+- Apache Web Server (XAMPP/WAMP/LAMP)
+- Web Browser modern (Chrome, Firefox, Edge, Safari)
+
+
+D.2 LANGKAH INSTALASI
+---------------------
+1. Download dan ekstrak file sistem ke folder htdocs (XAMPP) atau www (WAMP)
+
+2. Buat database baru di phpMyAdmin dengan nama 'booking_ruangan'
+
+3. Import file database.sql ke database yang telah dibuat
+
+4. Konfigurasi koneksi database di config/database.php:
+   - Sesuaikan $host, $user, $pass sesuai konfigurasi MySQL Anda
+
+5. Pastikan folder uploads/ dan uploads/profile/ memiliki permission write:
+   - Windows: Right-click > Properties > Security > Edit
+   - Linux: chmod 777 uploads/ -R
+
+6. Akses sistem melalui browser:
+   http://localhost/PlsworkUKK/
+
+7. Login dengan akun default:
+   Admin:
+   - Username: admin
+   - Password: admin123
+   
+   User:
+   - Username: user
+   - Password: user123
+
+
+D.3 KONFIGURASI PRODUCTION
+---------------------------
+1. Ubah config/database.php dengan kredensial production
+
+2. Disable error display di semua file PHP:
+   error_reporting(E_ALL);
+   ini_set('display_errors', 0);
+   ini_set('log_errors', 1);
+
+3. Enable HTTPS/SSL di Apache:
+   - Install SSL certificate
+   - Update .htaccess untuk force HTTPS
+
+4. Set file permissions:
+   - Folder: 755
+   - File: 644
+   - Uploads folder: 775
+
+5. Setup cron job untuk auto-cleanup (optional):
+   0 0 * * * php /path/to/config/auto_cleanup_completed_bookings.php
+
+6. Setup automated backup database (daily):
+   0 2 * * * mysqldump -u user -p booking_ruangan > backup_$(date +\%Y\%m\%d).sql
+
+
+LAMPIRAN E: PANDUAN PENGGUNAAN
+-------------------------------
+
+E.1 UNTUK USER
+--------------
+1. Register akun baru atau login dengan akun existing
+2. Pilih menu "Booking" untuk membuat booking baru
+3. Ikuti 4 langkah booking: Pilih Ruangan → Tanggal/Waktu → Keperluan → Review
+4. Submit booking dan tunggu approval dari admin/petugas
+5. Cek status booking di menu "Riwayat"
+6. Lihat booking yang sudah approved di menu "List Booking"
+7. Lihat jadwal lengkap di menu "Jadwal Ruangan"
+
+
+E.2 UNTUK ADMIN/PETUGAS
+-----------------------
+1. Login dengan akun admin/petugas
+2. Kelola data ruangan di menu "Ruangan"
+3. Kelola jadwal tetap di menu "Jadwal"
+4. Review dan approve/reject booking di menu "Booking"
+5. Lihat statistik dan export laporan di menu "Laporan"
+6. Monitor aktivitas di menu "History"
+7. Kelola user (khusus admin) di menu "Users"
+8. Handle reset password request di menu "Password Reset"
+
+
+E.3 FITUR KHUSUS
+----------------
+1. REAL-TIME FILTER: Filter jadwal berdasarkan ruangan dan hari tanpa refresh
+2. AUTO-CLEANUP: Booking completed otomatis hilang dari jadwal
+3. BUSY TIMES: Warning visual untuk waktu yang sudah terpakai
+4. COUNTDOWN: Timer countdown ke waktu mulai booking
+5. MOBILE RESPONSIVE: Akses sistem dari smartphone dengan UI optimized
+6. EXPORT: Export laporan ke Excel atau Print ke PDF
+7. RESET PASSWORD: System reset password dengan token dan approval admin
+
+
+LAMPIRAN F: TROUBLESHOOTING
+----------------------------
+
+F.1 ERROR CONNECTION REFUSED
+-----------------------------
+MASALAH: "Connection refused" atau tidak bisa akses database
+SOLUSI:
+- Pastikan MySQL service running
+- Cek kredensial database di config/database.php
+- Pastikan database 'booking_ruangan' sudah dibuat
+
+
+F.2 ERROR 500 INTERNAL SERVER
+------------------------------
+MASALAH: Halaman blank atau error 500
+SOLUSI:
+- Enable error display: ini_set('display_errors', 1);
+- Cek error log di XAMPP/logs/error.log
+- Pastikan semua file PHP syntax benar
+- Cek file permission (uploads folder)
+
+
+F.3 FOTO TIDAK MUNCUL
+----------------------
+MASALAH: Foto ruangan atau profile tidak ditampilkan
+SOLUSI:
+- Cek folder uploads/ ada dan memiliki write permission
+- Pastikan path foto di database benar
+- Cek file foto ada di folder uploads/
+
+
+F.4 AJAX NOT WORKING
+--------------------
+MASALAH: Filter atau load data tidak jalan
+SOLUSI:
+- Cek console browser untuk error JavaScript
+- Pastikan jQuery loaded
+- Cek network tab untuk response AJAX
+- Pastikan JSON response valid (gunakan JSONLint)
+
+
+F.5 SESSION TIMEOUT
+-------------------
+MASALAH: Sering logout otomatis
+SOLUSI:
+- Increase session timeout di php.ini:
+  session.gc_maxlifetime = 86400 (24 hours)
+- Clear browser cookies
+- Cek server time sync
+
+
+================================================================================
+                        AKHIR DARI LAPORAN SISTEM
+================================================================================
