@@ -44,7 +44,8 @@ INSERT INTO ruangan (nama_ruangan, kapasitas, fasilitas, lokasi, status) VALUES
 ('Ruang Rapat B', 15, 'TV LCD, AC, Meja Bundar, WiFi', 'Lantai 1', 'tersedia'),
 ('Aula Serbaguna', 100, 'Sound System, Proyektor, AC, Panggung, WiFi', 'Lantai 2', 'tersedia'),
 ('Ruang Seminar', 50, 'Proyektor, AC, Sound System, WiFi, Podium', 'Lantai 2', 'tersedia'),
-('Lab Komputer', 30, 'Komputer (30 unit), Proyektor, AC, WiFi', 'Lantai 3', 'tersedia');
+('Lab Komputer', 30, 'Komputer (30 unit), Proyektor, AC, WiFi', 'Lantai 3', 'tersedia')
+ON DUPLICATE KEY UPDATE nama_ruangan=VALUES(nama_ruangan);
 
 -- =====================================================
 -- CATATAN PENTING

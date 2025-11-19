@@ -10,7 +10,7 @@ if ($isRailway) {
     define('DB_USER', getenv('root'));
     define('DB_PASS', getenv('MClfPGdILKmmIxLDjwgZesirmxvnXqiQ'));
     define('DB_NAME', getenv('railway'));
-    define('DB_PORT', getenv('39388'));
+    define('DB_PORT', getenv('39338'));
 } else {
     // Localhost
     define('DB_HOST', 'localhost');
