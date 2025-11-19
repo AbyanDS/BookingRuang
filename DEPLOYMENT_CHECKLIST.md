@@ -53,7 +53,9 @@
 - [ ] Click **Add Reference**
 - [ ] Select MySQL database
 - [ ] Verify all MYSQL_* variables are added
-- [ ] Wait 1-2 minutes for changes to apply
+- [ ] **CRITICAL:** Wait 2-3 minutes for auto-redeploy
+- [ ] Check deployment logs (should show "Starting...")
+- [ ] Wait until status is green/running
 
 ### 4. Generate Domain
 - [ ] Go to **Settings** tab

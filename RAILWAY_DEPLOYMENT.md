@@ -240,17 +240,47 @@ git push -u origin main
 2. Pilih repository `booking-ruangan`
 3. Railway akan otomatis detect PHP dan mulai build
 
-### 3.4 Link Database ke Aplikasi
-1. Pada project Railway, klik aplikasi PHP Anda
+### 3.4 Link Database ke Aplikasi ⚠️ **PENTING!**
+
+Ini adalah langkah KRUSIAL. Jika tidak dilakukan, aplikasi tidak bisa connect ke database.
+
+**Cara 1: Menggunakan Reference Variables (Recommended)**
+1. Klik aplikasi **PHP service** Anda di Railway
 2. Buka tab **Variables**
-3. Klik **Add Reference** → Pilih MySQL database
-4. Railway akan otomatis menambahkan environment variables:
-   - `MYSQL_HOST`
-   - `MYSQL_USER`
-   - `MYSQL_PASSWORD`
-   - `MYSQL_DATABASE`
-   - `MYSQL_PORT`
-   - `DATABASE_URL`
+3. Klik **New Variable** dropdown → Pilih **Add Reference**
+4. Pilih **MySQL** service dari daftar
+5. Railway akan otomatis menambahkan semua variables:
+   - ✅ `MYSQL_HOST`
+   - ✅ `MYSQL_USER`
+   - ✅ `MYSQL_PASSWORD`
+   - ✅ `MYSQL_DATABASE`
+   - ✅ `MYSQL_PORT`
+   - ✅ `DATABASE_URL`
+6. **PENTING:** Tunggu 1-2 menit setelah linking
+7. Aplikasi akan auto-redeploy dengan variables baru
+
+**Cara 2: Copy Variables Manual (Alternatif)**
+1. Klik **MySQL** service di Railway
+2. Buka tab **Variables**
+3. Copy nilai dari:
+   - `MYSQLHOST`
+   - `MYSQLUSER`
+   - `MYSQLPASSWORD`
+   - `MYSQLDATABASE`
+   - `MYSQLPORT`
+4. Klik aplikasi **PHP service**
+5. Buka tab **Variables**
+6. Klik **New Variable** untuk setiap value:
+   - Name: `MYSQL_HOST`, Value: [paste dari MYSQLHOST]
+   - Name: `MYSQL_USER`, Value: [paste dari MYSQLUSER]
+   - Name: `MYSQL_PASSWORD`, Value: [paste dari MYSQLPASSWORD]
+   - Name: `MYSQL_DATABASE`, Value: [paste dari MYSQLDATABASE]
+   - Name: `MYSQL_PORT`, Value: [paste dari MYSQLPORT]
+
+**Verifikasi:**
+- Setelah linking, buka `https://your-domain.railway.app/test_db_connection.php`
+- Pastikan semua environment variables terdeteksi (✅)
+- Jika masih error, tunggu 2-3 menit dan refresh
 
 ### 3.5 Setup Database Schema
 1. Klik pada MySQL database
@@ -344,6 +374,26 @@ echo password_hash('password', PASSWORD_DEFAULT);
 
 ## 🐛 Troubleshooting
 
+### Error: No such file or directory (mysqli_connect)
+**Penyebab:** Database belum di-link ke aplikasi atau environment variables tidak tersedia
+
+**Solusi:**
+1. ✅ **Link Database ke Aplikasi** (Langkah paling penting!)
+   - PHP App → Variables → Add Reference → Select MySQL
+   - Tunggu 1-2 menit untuk auto-redeploy
+   
+2. ✅ **Verifikasi Environment Variables**
+   - Buka `test_db_connection.php` di browser
+   - Pastikan semua MYSQL_* variables terdeteksi
+   
+3. ✅ **Manual Check**
+   - Klik MySQL service → Copy variables
+   - Klik PHP service → Paste variables manual
+   
+4. ✅ **Restart Services**
+   - Klik PHP service → Settings → Restart
+   - Tunggu deployment selesai
+
 ### Error: undefined variable 'apache' (Build Error)
 **Penyebab:** Package `apache` tidak tersedia di Nixpkgs untuk Railway
 
@@ -354,12 +404,13 @@ echo password_hash('password', PASSWORD_DEFAULT);
 cmd = 'php -S 0.0.0.0:$PORT -t . router.php'
 ```
 
-### Error: Database Connection Failed
+### Error: Database Connection Failed (After Linking)
 **Solusi:**
-1. Cek Variables di Railway sudah benar
-2. Pastikan MySQL service sudah running
-3. Cek `config/database.php` menggunakan environment variables
-4. Test koneksi manual dengan file `test_db_connection.php`
+1. Tunggu 2-3 menit setelah linking variables
+2. Cek Railway logs: Deployments → View Logs
+3. Pastikan MySQL service status hijau (running)
+4. Test dengan `test_db_connection.php`
+5. Jika masih gagal, redeploy manual: Settings → Redeploy
 
 ### Error: 404 Not Found
 **Solusi:**
