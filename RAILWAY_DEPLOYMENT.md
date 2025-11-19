@@ -16,10 +16,48 @@ Project ini adalah aplikasi PHP Native yang akan di-deploy ke Railway menggunaka
 
 ## 📁 Langkah 1: Persiapan File Konfigurasi
 
-### 1.1 Buat File `.htaccess`
-Buat file `.htaccess` di root project untuk konfigurasi Apache:
+### 1.1 Buat File `router.php`
+File router untuk PHP built-in server di Railway:
+
+```php
+<?php
+/**
+ * Router untuk PHP Built-in Server (Railway)
+ */
+$uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+
+// Jika file statis ada (css, js, images), serve langsung
+if ($uri !== '/' && file_exists(__DIR__ . $uri)) {
+    return false;
+}
+
+// Jika file PHP ada, include file tersebut
+if (preg_match('/\.php$/', $uri)) {
+    $file = __DIR__ . $uri;
+    if (file_exists($file)) {
+        return false;
+    }
+}
+
+// Default ke index.php
+if ($uri === '/') {
+    include __DIR__ . '/index.php';
+    exit;
+}
+
+// File tidak ditemukan
+http_response_code(404);
+echo "404 - File Not Found";
+?>
+```
+
+### 1.2 File `.htaccess` (Untuk Local Development)
+File ini hanya untuk development lokal dengan Apache, **tidak digunakan di Railway**:
 
 ```apache
+# Note: Untuk Railway, kita menggunakan PHP built-in server
+# File .htaccess ini untuk development lokal dengan Apache
+
 # Enable PHP
 AddType application/x-httpd-php .php
 
@@ -33,12 +71,6 @@ php_flag log_errors On
 # Security
 Options -Indexes
 
-# Rewrite rules (opsional)
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /
-</IfModule>
-
 # Protect config files
 <FilesMatch "^(database\.php|functions\.php)$">
     Order allow,deny
@@ -46,7 +78,7 @@ Options -Indexes
 </FilesMatch>
 ```
 
-### 1.2 Update File `config/database.php`
+### 1.3 Update File `config/database.php`
 Ubah konfigurasi database untuk mendukung environment variables:
 
 ```php
@@ -75,21 +107,23 @@ mysqli_set_charset($conn, "utf8");
 ?>
 ```
 
-### 1.3 Buat File `nixpacks.toml`
+### 1.4 Buat File `nixpacks.toml`
 File ini memberitahu Railway cara build dan run aplikasi PHP:
 
 ```toml
 [phases.setup]
-nixPkgs = ['php82', 'php82Extensions.mysqli', 'php82Extensions.pdo', 'php82Extensions.pdo_mysql', 'apache']
+nixPkgs = ['php82', 'php82Extensions.mysqli', 'php82Extensions.pdo', 'php82Extensions.pdo_mysql', 'php82Extensions.mbstring', 'php82Extensions.gd']
 
 [phases.install]
 cmds = ['echo "Installing dependencies..."']
 
 [start]
-cmd = 'apachectl -D FOREGROUND'
+cmd = 'php -S 0.0.0.0:$PORT -t . router.php'
 ```
 
-### 1.4 Buat File `railway.json`
+**Catatan:** Railway menggunakan PHP built-in server, bukan Apache. File `router.php` akan handle routing.
+
+### 1.5 Buat File `railway.json`
 Konfigurasi tambahan untuk Railway:
 
 ```json
@@ -107,7 +141,7 @@ Konfigurasi tambahan untuk Railway:
 }
 ```
 
-### 1.5 Buat File `.gitignore`
+### 1.6 Buat File `.gitignore`
 Untuk tidak mengupload file yang tidak perlu:
 
 ```
@@ -143,7 +177,7 @@ Thumbs.db
 *.bak
 ```
 
-### 1.6 Buat File `uploads/.gitkeep`
+### 1.7 Buat File `uploads/.gitkeep`
 Agar folder uploads tetap ada di Git:
 
 ```
@@ -310,23 +344,36 @@ echo password_hash('password', PASSWORD_DEFAULT);
 
 ## 🐛 Troubleshooting
 
+### Error: undefined variable 'apache' (Build Error)
+**Penyebab:** Package `apache` tidak tersedia di Nixpkgs untuk Railway
+
+**Solusi:**
+✅ **Sudah diperbaiki!** File `nixpacks.toml` sekarang menggunakan PHP built-in server:
+```toml
+[start]
+cmd = 'php -S 0.0.0.0:$PORT -t . router.php'
+```
+
 ### Error: Database Connection Failed
 **Solusi:**
 1. Cek Variables di Railway sudah benar
 2. Pastikan MySQL service sudah running
 3. Cek `config/database.php` menggunakan environment variables
-4. Test koneksi manual:
-```php
-echo "Host: " . getenv('MYSQL_HOST') . "\n";
-echo "User: " . getenv('MYSQL_USER') . "\n";
-echo "Database: " . getenv('MYSQL_DATABASE') . "\n";
-```
+4. Test koneksi manual dengan file `test_db_connection.php`
 
 ### Error: 404 Not Found
 **Solusi:**
-1. Cek file `.htaccess` ada di root
-2. Pastikan DirectoryIndex sudah diset
-3. Cek Apache mod_rewrite enabled
+1. Pastikan file `router.php` ada di root project
+2. Cek build logs untuk error
+3. Tunggu build selesai (2-3 menit)
+4. Test dengan path langsung: `/index.php`
+
+### Error: CSS/JS/Images Tidak Load
+**Solusi:**
+1. Cek file `router.php` sudah benar
+2. Pastikan path assets benar (relative path)
+3. Cek browser console untuk error 404
+4. Contoh path yang benar: `assets/css/style.css`
 
 ### Error: Upload File Failed
 **Solusi:**

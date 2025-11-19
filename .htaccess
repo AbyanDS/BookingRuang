@@ -1,3 +1,6 @@
+# Note: Untuk Railway, kita menggunakan PHP built-in server
+# File .htaccess ini untuk development lokal dengan Apache
+
 # Enable PHP
 AddType application/x-httpd-php .php
 
@@ -10,12 +13,6 @@ php_flag log_errors On
 
 # Security
 Options -Indexes
-
-# Rewrite rules
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /
-</IfModule>
 
 # Protect config files
 <FilesMatch "^(database\.php|functions\.php)$">

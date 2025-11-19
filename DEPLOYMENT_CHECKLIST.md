@@ -3,7 +3,8 @@
 ## 📋 Pre-Deployment Checklist
 
 ### File Konfigurasi
-- [x] `.htaccess` - Apache configuration
+- [x] `router.php` - PHP built-in server router
+- [x] `.htaccess` - Apache configuration (untuk local)
 - [x] `nixpacks.toml` - Nixpacks build config
 - [x] `railway.json` - Railway deployment settings
 - [x] `.gitignore` - Ignore patterns
